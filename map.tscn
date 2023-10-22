@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://b1fxyaxnhevfg"]
+
+[ext_resource type="TileSet" uid="uid://qjvag22n0xj8" path="res://map-tilemap.tres" id="1_v5mdt"]
+[ext_resource type="Script" path="res://Large Map.gd" id="2_8y3yl"]
+[ext_resource type="Script" path="res://Camera Controller.gd" id="3_tosmt"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Large Map" type="TileMap" parent="."]
+scale = Vector2(8, 8)
+tile_set = ExtResource("1_v5mdt")
+format = 2
+script = ExtResource("2_8y3yl")
+
+[node name="Map" type="TileMap" parent="."]
+tile_set = ExtResource("1_v5mdt")
+format = 2
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(175, 150)
+script = ExtResource("3_tosmt")
