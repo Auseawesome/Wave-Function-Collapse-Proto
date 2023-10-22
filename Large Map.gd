@@ -43,17 +43,17 @@ func create_multi_array(dimensions: Array,fill_value = null) -> Array:
 func set_tile(coords,atlas_coords):
 	set_cell(0,coords,0,atlas_coords)
 
-func get_tile_data_of(position: Vector2, dataType: String):
-	var tile_data : TileData = tileset_source.get_tile_data(position, 0)
+func get_tile_data_of(tile_position: Vector2, dataType: String):
+	var tile_data : TileData = tileset_source.get_tile_data(tile_position, 0)
 	return tile_data.get_custom_data(dataType)
 
-func get_all_materials_of(position: Vector2) -> Array:
+func get_all_materials_of(tile_position: Vector2) -> Array:
 	return [
-		get_tile_data_of(position, "Core Material"),
-		get_tile_data_of(position, "North East Material"),
-		get_tile_data_of(position, "South East Material"),
-		get_tile_data_of(position, "South West Material"),
-		get_tile_data_of(position, "North West Material")
+		get_tile_data_of(tile_position, "Core Material"),
+		get_tile_data_of(tile_position, "North East Material"),
+		get_tile_data_of(tile_position, "South East Material"),
+		get_tile_data_of(tile_position, "South West Material"),
+		get_tile_data_of(tile_position, "North West Material")
 	]
 
 func get_tiles_with_data(dataType: String, dataValue: String):
@@ -74,15 +74,15 @@ func get_material_ids() -> Dictionary:
 	var local_material_ids: Dictionary
 	# Iterates through all tiles
 	for tile in tile_list:
-		var material = get_tile_data_of(tile, "Core Material")
+		var tile_material = get_tile_data_of(tile, "Core Material")
 		# Checks if material is not currently in materials dictionary
-		if not local_material_ids.has(material):
+		if not local_material_ids.has(tile_material):
 			# If material wasn't present adds it to dictionary with unique ID
-			local_material_ids[material] = local_material_ids.size()
+			local_material_ids[tile_material] = local_material_ids.size()
 	return local_material_ids
 
-func get_material_id_of(material: String):
-	return material_ids[material]
+func get_material_id_of(tile_material: String):
+	return material_ids[tile_material]
 
 func get_unique_tiles():
 	var local_unique_tiles: Dictionary
