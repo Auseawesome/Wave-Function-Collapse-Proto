@@ -21,10 +21,6 @@ func _ready():
 	randomize()
 	generate_world()
 
-
-func _process(delta):
-	pass
-
 func create_multi_array(dimensions: Array,fill_value = null) -> Array:
 	var multi_array: Array
 	# Reverses dimensions array
@@ -90,7 +86,7 @@ func get_unique_tiles():
 	for tile in tile_list:
 		# Converts a tile into an array of material ids in the same order as get_all_materials_of() returns
 		var id_array: Array = get_all_materials_of(tile).map(get_material_id_of)
-		var tile_id: int
+		var tile_id: int = 0
 		# Reverses ID array so each digit in base material_ids.size() corresponds to id of material in same order as get_all_materials_of() returns
 		id_array.reverse()
 		# Converts the id_array into a base material_ids.size() number id which corresponds to the materials on the tile
@@ -114,7 +110,6 @@ func get_tileset_dimensions():
 	return tileset_source.get_tile_id(tileset_source.get_tiles_count()-1)+Vector2i(1,1)
 
 func get_random_tile():
-	var random_tile: Vector2
 	var tile_array: Array
 	# Converts unique_tiles array into list of tile types
 	for tile_type in unique_tiles:

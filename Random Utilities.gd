@@ -4,14 +4,14 @@ func _init():
 	randomize()
 
 func random_choice(choices: Array,weights: Array=[]):
-	var total_weight: float
+	var total_weight: float = 0.0
 	if weights == []:
 		for i in choices.size():
 			weights = weights + [1.0]
 	for weight in weights:
 		total_weight += weight
 	var rand_position: float = randf() * total_weight
-	var weight_progress: float
+	var weight_progress: float = 0.0
 	for i in weights.size():
 		weight_progress += weights[i]
 		if weight_progress > rand_position:
