@@ -1,8 +1,11 @@
 class_name RandomUtilities
 
+## A class containing a variety of functions for randomised actions using psuedo-random number generators
+
 func _init():
 	randomize()
 
+## Picks a random choice out of a provided array using an optional weights array for weighted values
 func random_choice(choices: Array,weights: Array=[]):
 	var total_weight: float = 0.0
 	if weights == []:

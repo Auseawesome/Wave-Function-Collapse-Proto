@@ -1,15 +1,16 @@
 class_name GeneratedTileMap extends TileMap
+## This class allows for a tilemap set to be automatically generated with a heavily modfied version of the wave function collapse algorithm
 
-@export var map_width: int = 16
-@export var map_height: int = 16
+@export var map_width: int = 16 ## A variable that dictates the width of the tilemap
+@export var map_height: int = 16 ## A variable that dictates the height of the tilemap
 
-var Random = load("res://Random Utilities.gd").new()
-var tileset_source : TileSetSource = get_tileset().get_source(0)
-var tile_list: PackedVector2Array
-var material_ids: Dictionary
-var unique_tiles: Dictionary
-var tile_values: Array
-var tileset_dimensions: Vector2
+var Random: RandomUtilities = load("res://Random Utilities.gd").new() ## Library containing all functions pertaining to psuedo-randomness
+var tileset_source : TileSetSource = get_tileset().get_source(0) ## A variable containing the first tileset source in the tileset used by the tilemap
+var tile_list: PackedVector2Array ## An array of Vector2 used to contain the data for tiles in the tilemap
+var material_ids: Dictionary ## A dictionary containing ids and the corresponding material for quick lookup
+var unique_tiles: Dictionary ## A dictionary containing all possible variations of materials within a tile
+var tile_values: Array ## An array containing values pertaining to materials each tile within the tilemap can consist of
+var tileset_dimensions: Vector2 ## A vector 2 storing the dimensions of the tileset
 
 func _ready():
 	tile_list = get_tile_list()
@@ -21,7 +22,7 @@ func _ready():
 	randomize()
 	generate_world()
 
-func create_multi_array(dimensions: Array,fill_value = null) -> Array:
+func create_multi_array(dimensions: Array,fill_value = null) -> Array: ## A helper function streamlining the creation of multidimensional arrays
 	var multi_array: Array
 	# Reverses dimensions array
 	dimensions.reverse()
@@ -36,35 +37,55 @@ func create_multi_array(dimensions: Array,fill_value = null) -> Array:
 		multi_array = temp_array
 	return multi_array
 
-func set_tile(coords,atlas_coords):
+func set_tile(coords,atlas_coords): ## A helper function that allows tiles to be easily set within the tilemap
 	set_cell(0,coords,0,atlas_coords)
 
-func get_all_tileset_tile_data_of(atlas_position: Vector2, dataType: String):
+func get_tileset_tile_data_of(atlas_position: Vector2, dataType: String): ## A function that returns a custom tile data type of the tile at the specified atlas position
 	var tile_data : TileData = tileset_source.get_tile_data(atlas_position, 0)
 	return tile_data.get_custom_data(dataType)
 
-func get_all_tileset_materials_of(atlas_position: Vector2) -> Array:
+## A function that returns all the materials of a tile at the specified atlas position [br]
+## [br]
+## These materials are returned in an array formatted as follows: [br]
+## [ [br]
+## Core Material [br]
+## North East Material [br]
+## South East Material [br]
+## South West Material [br]
+## North West Material [br]
+## ]
+func get_tileset_materials_of(atlas_position: Vector2) -> Array:
 	return [
-		get_all_tileset_tile_data_of(atlas_position, "Core Material"),
-		get_all_tileset_tile_data_of(atlas_position, "North East Material"),
-		get_all_tileset_tile_data_of(atlas_position, "South East Material"),
-		get_all_tileset_tile_data_of(atlas_position, "South West Material"),
-		get_all_tileset_tile_data_of(atlas_position, "North West Material")
+		get_tileset_tile_data_of(atlas_position, "Core Material"),
+		get_tileset_tile_data_of(atlas_position, "North East Material"),
+		get_tileset_tile_data_of(atlas_position, "South East Material"),
+		get_tileset_tile_data_of(atlas_position, "South West Material"),
+		get_tileset_tile_data_of(atlas_position, "North West Material")
 	]
 
-func get_all_tilemap_tile_data_of(tile_position: Vector2, dataType: String):
+func get_tilemap_tile_data_of(tile_position: Vector2, dataType: String): ## A function that returns a custom tile data type of the tile at the specified tilemap position
 	var tile_data: TileData = get_cell_tile_data(0, tile_position)
 	if tile_data == null:
 		return ""
 	return tile_data.get_custom_data(dataType)
 
-func get_all_tilemap_materials_of(tile_position: Vector2) -> Array:
+## A function that returns all the materials of a tile at the specified tilemap position [br]
+## [br]
+## These materials are returned in an array formatted as follows: [br]
+## [ [br]
+## Core Material [br]
+## North East Material [br]
+## South East Material [br]
+## South West Material [br]
+## North West Material [br]
+## ]
+func get_tilemap_materials_of(tile_position: Vector2) -> Array:
 	return [
-		get_all_tilemap_tile_data_of(tile_position, "Core Material"),
-		get_all_tilemap_tile_data_of(tile_position, "North East Material"),
-		get_all_tilemap_tile_data_of(tile_position, "South East Material"),
-		get_all_tilemap_tile_data_of(tile_position, "South West Material"),
-		get_all_tilemap_tile_data_of(tile_position, "North West Material")
+		get_tilemap_tile_data_of(tile_position, "Core Material"),
+		get_tilemap_tile_data_of(tile_position, "North East Material"),
+		get_tilemap_tile_data_of(tile_position, "South East Material"),
+		get_tilemap_tile_data_of(tile_position, "South West Material"),
+		get_tilemap_tile_data_of(tile_position, "North West Material")
 	]
 
 func get_tiles_with_data(dataType: String, dataValue: String):
@@ -85,7 +106,7 @@ func get_material_ids() -> Dictionary:
 	var local_material_ids: Dictionary
 	# Iterates through all tiles
 	for tile in tile_list:
-		var tile_material = get_all_tileset_tile_data_of(tile, "Core Material")
+		var tile_material = get_tileset_tile_data_of(tile, "Core Material")
 		# Checks if material is not currently in materials dictionary
 		if not local_material_ids.has(tile_material):
 			# If material wasn't present adds it to dictionary with unique ID
@@ -100,7 +121,7 @@ func get_unique_tiles():
 	# Iterates through all tiles
 	for tile in tile_list:
 		# Converts a tile into an array of material ids in the same order as get_all_tileset_materials_of() returns
-		var id_array: Array = get_all_tileset_materials_of(tile).map(get_material_id_of)
+		var id_array: Array = get_tileset_materials_of(tile).map(get_material_id_of)
 		var tile_id: int = 0
 		# Reverses ID array so each digit in base material_ids.size() corresponds to id of material in same order as get_all_tileset_materials_of() returns
 		id_array.reverse()
@@ -139,7 +160,7 @@ func get_possible_materials(coords) -> bool:
 	var south_east_material := ""
 	var south_west_material := ""
 	var north_west_material := ""
-	var north_materials: Array = get_all_tilemap_materials_of(coords+Vector2(0,-1))
+	var north_materials: Array = get_tilemap_materials_of(coords+Vector2(0,-1))
 	if not north_materials.has(""):
 		# Sets north east material to south east material of tile north of it
 		north_east_material = north_materials[2]
@@ -157,7 +178,7 @@ func get_possible_materials(coords) -> bool:
 		# Return 0 as an invalid tile has been encountered
 		else:
 			return 0
-	var east_materials = get_all_tilemap_materials_of(coords+Vector2(1,0))
+	var east_materials = get_tilemap_materials_of(coords+Vector2(1,0))
 	if not east_materials.has(""):
 		# If the north west material of the tile to the east is not the same as the current north east tile and the northern tile was valid, return 0 as there are conflicting tiles
 		if east_materials[4] != north_east_material and north_east_material != "":
@@ -188,7 +209,7 @@ func get_possible_materials(coords) -> bool:
 		# Return 0 as an invalid tile has been encountered
 		else:
 			return 0
-	var south_materials = get_all_tilemap_materials_of(coords+Vector2(0,1))
+	var south_materials = get_tilemap_materials_of(coords+Vector2(0,1))
 	if not south_materials.has(""):
 		# If the north east material of the tile to the south is not the same as the current south east tile and the eastern tile was valid, return 0 as there are conflicting tiles
 		if south_materials[1] != south_east_material and south_east_material != "":
@@ -219,7 +240,7 @@ func get_possible_materials(coords) -> bool:
 		# Return 0 as an invalid tile has been encountered
 		else:
 			return 0
-	var west_materials = get_all_tilemap_materials_of(coords+Vector2(-1,0))
+	var west_materials = get_tilemap_materials_of(coords+Vector2(-1,0))
 	if not west_materials.has(""):
 		# If the south east material of the western tile is not the same as the current south west tile and the south west material has been set, return 0 as there are conflicting tiles
 		if west_materials[2] != south_west_material and south_west_material != "":
@@ -257,12 +278,12 @@ func get_possible_materials(coords) -> bool:
 
 func get_possible_tiles(coords):
 	if get_possible_materials(coords):
-		pass # Write code to get number of possible tiles
+		pass # TODO: Write code to get number of possible tiles
 	else:
-		pass # Do something here. This triggers if get_possible_materials() fails
+		pass # TODO: Do something here. This triggers if get_possible_materials() fails
 
 func place_tile(coords: Vector2, tile: Vector2):
-	tile_values[coords.x][coords.y] = get_all_tileset_materials_of(tile)
+	tile_values[coords.x][coords.y] = get_tileset_materials_of(tile)
 	set_tile(coords,tile)
 	# Call method to update materials of nearby tiles
 
